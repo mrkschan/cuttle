@@ -1,0 +1,2 @@
+gom "github.com/Sirupsen/logrus"
+gom "github.com/elazarl/goproxy"
