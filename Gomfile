@@ -1,2 +1,3 @@
 gom "github.com/Sirupsen/logrus"
+gom "github.com/cloudflare/conf"
 gom "github.com/elazarl/goproxy"
