@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{})
 
 	config, err := conf.ReadConfigFile("cuttle.conf")
@@ -21,7 +22,7 @@ func main() {
 	control := config.GetString("limitcontrol", "rps")
 	if control == "rps" {
 		limit := config.GetUint("rps-limit", 2)
-		setLimitController(RPSController{
+		setLimitController(&RPSController{
 			limit: limit,
 		})
 	} else {
@@ -39,11 +40,10 @@ func main() {
 
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			// Block until permission granted from contoller.
-			<-RateLimitFIFO
+			// Acquire permission to forward request to downstream.
+			controller.Acquire()
 
-			// Send request.
-			return r, nil
+			return r, nil // Forward request.
 		})
 
 	log.Fatal(http.ListenAndServe(addr, proxy))
