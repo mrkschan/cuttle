@@ -12,8 +12,8 @@ type LimitController interface {
 	Acquire()
 }
 
-// RPSController provides requests per second rate limit control.
-type RPSController struct {
+// RPSControl provides requests per second rate limit control.
+type RPSControl struct {
 	// Limit holds the number of requests per second.
 	Limit uint
 
@@ -22,8 +22,8 @@ type RPSController struct {
 	seen        *list.List
 }
 
-// Start running RPSController.
-func (c *RPSController) Start() {
+// Start running RPSControl.
+func (c *RPSControl) Start() {
 	c.pendingChan = make(chan uint)
 	c.readyChan = make(chan uint)
 	c.seen = list.New()
@@ -52,8 +52,8 @@ func (c *RPSController) Start() {
 	}()
 }
 
-// Acquire permission to forward request from RPSController.
-func (c *RPSController) Acquire() {
+// Acquire permission to forward request from RPSControl.
+func (c *RPSControl) Acquire() {
 	c.pendingChan <- 1
 	<-c.readyChan
 }

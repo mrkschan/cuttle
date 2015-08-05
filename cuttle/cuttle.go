@@ -23,7 +23,7 @@ func main() {
 	control := config.GetString("limitcontrol", "rps")
 	if control == "rps" {
 		limit := config.GetUint("rps-limit", 2)
-		controller = &RPSController{
+		controller = &RPSControl{
 			Limit: limit,
 		}
 	} else {
