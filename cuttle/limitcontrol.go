@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/list"
 	log "github.com/Sirupsen/logrus"
 	"time"
 )
@@ -11,32 +12,40 @@ type LimitController interface {
 	Acquire()
 }
 
-// RPSController provides request per second rate limit.
+// RPSController provides requests per second rate limit control.
 type RPSController struct {
+	// Limit holds the number of requests per second.
 	Limit uint
 
 	pendingChan chan uint
 	readyChan   chan uint
-	lastNano    int64
+	seen        *list.List
 }
 
 // Start running RPSController.
 func (c *RPSController) Start() {
 	c.pendingChan = make(chan uint)
 	c.readyChan = make(chan uint)
+	c.seen = list.New()
 
 	go func() {
 		for {
 			<-c.pendingChan
 
-			nanoElapsed := time.Now().UnixNano() - c.lastNano
-			milliElapsed := nanoElapsed / int64(time.Millisecond)
-			log.Debug("RPS Limit Control: ", "elapsed=", milliElapsed)
+			if uint(c.seen.Len()) == c.Limit {
+				front := c.seen.Front()
+				nanoElapsed := time.Now().UnixNano() - front.Value.(int64)
+				milliElapsed := nanoElapsed / int64(time.Millisecond)
+				log.Debug("RPS control: ", "elapsed=", milliElapsed)
 
-			if milliElapsed < 1000 {
-				time.Sleep(time.Duration(milliElapsed) * time.Millisecond)
+				if waitTime := 1000 - milliElapsed; waitTime > 0 {
+					log.Debug("RPS control: ", "wait=", waitTime)
+					time.Sleep(time.Duration(waitTime) * time.Millisecond)
+				}
+
+				c.seen.Remove(front)
 			}
-			c.lastNano = time.Now().UnixNano()
+			c.seen.PushBack(time.Now().UnixNano())
 
 			c.readyChan <- 1
 		}
