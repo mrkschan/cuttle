@@ -19,12 +19,13 @@ func main() {
 	}
 
 	// Config limit controller.
+	var controller LimitController
 	control := config.GetString("limitcontrol", "rps")
 	if control == "rps" {
 		limit := config.GetUint("rps-limit", 2)
-		setLimitController(&RPSController{
-			limit: limit,
-		})
+		controller = &RPSController{
+			Limit: limit,
+		}
 	} else {
 		log.Fatal("Unknown limit control: ", control)
 	}
@@ -36,7 +37,7 @@ func main() {
 	proxy.Verbose = verbose == 1
 
 	// Starts now.
-	startLimitControl()
+	controller.Start()
 
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
