@@ -1,0 +1,12 @@
+# Address format from golang.org/pkg/net/http, default ":8123"
+addr: :8123
+verbose: true
+
+
+###
+# Available limit controllers:
+# - "rps" (Request-per-second)
+###
+limitcontrol:
+    controller: rps
+    limit: 2  # Request per second, default 2.

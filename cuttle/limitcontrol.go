@@ -15,7 +15,7 @@ type LimitController interface {
 // RPSControl provides requests per second rate limit control.
 type RPSControl struct {
 	// Limit holds the number of requests per second.
-	Limit uint
+	Limit int
 
 	pendingChan chan uint
 	readyChan   chan uint
@@ -32,7 +32,7 @@ func (c *RPSControl) Start() {
 		for {
 			<-c.pendingChan
 
-			if uint(c.seen.Len()) == c.Limit {
+			if c.seen.Len() == c.Limit {
 				front := c.seen.Front()
 				nanoElapsed := time.Now().UnixNano() - front.Value.(int64)
 				milliElapsed := nanoElapsed / int64(time.Millisecond)

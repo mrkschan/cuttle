@@ -4,25 +4,33 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/cloudflare/conf"
 	"github.com/elazarl/goproxy"
+	"github.com/spf13/viper"
 )
 
 func main() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
 
-	config, err := conf.ReadConfigFile("cuttle.conf")
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("cuttle")
+	viper.AddConfigPath("/etc/cuttle/")
+
+	err := viper.ReadInConfig()
 	if err != nil {
-		log.Error("Failed to load config from 'cuttle.conf'.")
+		log.Error("Failed to load config from 'cuttle.yml'.")
 		log.Fatal(err)
 	}
 
+	viper.SetDefault("addr", ":8123")
+	viper.SetDefault("verbose", false)
+	viper.SetDefault("limitcontrol", map[string]interface{}{"controller": "rps", "limit": 2})
+
 	// Config limit controller.
 	var controller LimitController
-	control := config.GetString("limitcontrol", "rps")
+	control := viper.GetString("limitcontrol.controller")
 	if control == "rps" {
-		limit := config.GetUint("rps-limit", 2)
+		limit := viper.GetInt("limitcontrol.limit")
 		controller = &RPSControl{
 			Limit: limit,
 		}
@@ -31,10 +39,10 @@ func main() {
 	}
 
 	// Config proxy.
-	addr := config.GetString("addr", ":8123")
-	verbose := config.GetUint("verbose", 0)
+	addr := viper.GetString("addr")
+	verbose := viper.GetBool("verbose")
 	proxy := goproxy.NewProxyHttpServer()
-	proxy.Verbose = verbose == 1
+	proxy.Verbose = verbose
 
 	// Starts now.
 	controller.Start()
