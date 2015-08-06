@@ -10,7 +10,7 @@ import (
 
 func main() {
 	log.SetLevel(log.DebugLevel)
-	log.SetFormatter(&log.TextFormatter{})
+	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
 
 	config, err := conf.ReadConfigFile("cuttle.conf")
 	if err != nil {
