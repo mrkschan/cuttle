@@ -24,20 +24,34 @@ func main() {
 
 	viper.SetDefault("addr", ":8123")
 	viper.SetDefault("verbose", false)
-	viper.SetDefault("limitcontrol", map[string]interface{}{"controller": "rps", "limit": 2})
 
-	// Config limit controller.
-	var controller LimitController
-	control := viper.GetString("limitcontrol.controller")
-	if control == "rps" {
-		limit := viper.GetInt("limitcontrol.limit")
-		controller = &RPSControl{
-			Limit: limit,
+	defaults := []map[string]interface{}{{"host": "*", "shared": true, "control": "noop"}}
+	viper.SetDefault("zones", defaults)
+
+	configs := viper.Get("zones").([]interface{})
+	metas := make([]Meta, len(configs))
+	for i, v := range configs {
+		config := v.(map[interface{}]interface{})
+		metas[i] = Meta{
+			Host:    config["host"].(string),
+			Shared:  config["shared"].(bool),
+			Control: config["control"].(string),
+			Limit:   config["limit"].(int),
 		}
-	} else {
-		log.Fatal("Unknown limit control: ", control)
 	}
 
+	// // Config limit controller.
+	// var controller LimitController
+	// control := viper.GetString("limitcontrol.controller")
+	// if control == "rps" {
+	// 	limit := viper.GetInt("limitcontrol.limit")
+	// 	controller = &RPSControl{
+	// 		Limit: limit,
+	// 	}
+	// } else {
+	// 	log.Fatal("Unknown limit control: ", control)
+	// }
+	//
 	// Config proxy.
 	addr := viper.GetString("addr")
 	verbose := viper.GetBool("verbose")
@@ -45,15 +59,15 @@ func main() {
 	proxy.Verbose = verbose
 
 	// Starts now.
-	controller.Start()
-
-	proxy.OnRequest().DoFunc(
-		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			// Acquire permission to forward request to downstream.
-			controller.Acquire()
-
-			return r, nil // Forward request.
-		})
+	// controller.Start()
+	//
+	// proxy.OnRequest().DoFunc(
+	// 	func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+	// 		// Acquire permission to forward request to downstream.
+	// 		controller.Acquire()
+	//
+	// 		return r, nil // Forward request.
+	// 	})
 
 	log.Fatal(http.ListenAndServe(addr, proxy))
 }
