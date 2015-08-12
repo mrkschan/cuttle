@@ -32,15 +32,12 @@ func main() {
 	zones := make([]Zone, len(configs))
 	for i, v := range configs {
 		config := v.(map[interface{}]interface{})
-		zone := Zone{
-			Host:    config["host"].(string),
-			Shared:  config["shared"].(bool),
-			Control: config["control"].(string),
-			Limit:   config["limit"].(int),
-		}
-		zone.Activate()
-
-		zones[i] = zone
+		zones[i] = *NewZone(
+			config["host"].(string),
+			config["shared"].(bool),
+			config["control"].(string),
+			config["limit"].(int),
+		)
 	}
 
 	// // Config limit controller.

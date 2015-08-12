@@ -8,13 +8,7 @@ func TestZone(t *testing.T) {
 	var zone Zone
 	var c1, c2 LimitController
 
-	zone = Zone{
-		Host:    "*.github.com",
-		Shared:  true,
-		Control: "rps",
-		Limit:   2,
-	}
-	zone.Activate()
+	zone = *NewZone("*.github.com", true, "rps", 2)
 
 	c1 = zone.GetController("www.github.com")
 	c2 = zone.GetController("api.github.com")
@@ -22,13 +16,7 @@ func TestZone(t *testing.T) {
 		t.Errorf("Shared zone should return shared controller.")
 	}
 
-	zone = Zone{
-		Host:    "*.github.com",
-		Shared:  false,
-		Control: "rps",
-		Limit:   2,
-	}
-	zone.Activate()
+	zone = *NewZone("*.github.com", false, "rps", 2)
 
 	c1 = zone.GetController("www.github.com")
 	c2 = zone.GetController("api.github.com")

@@ -22,12 +22,12 @@ type RPSControl struct {
 	seen        *list.List
 }
 
+func NewRPSControl(limit int) *RPSControl {
+	return &RPSControl{limit, make(chan uint), make(chan uint), list.New()}
+}
+
 // Start running RPSControl.
 func (c *RPSControl) Start() {
-	c.pendingChan = make(chan uint)
-	c.readyChan = make(chan uint)
-	c.seen = list.New()
-
 	go func() {
 		for {
 			<-c.pendingChan

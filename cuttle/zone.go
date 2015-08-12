@@ -9,8 +9,8 @@ type Zone struct {
 	controllers map[string]LimitController
 }
 
-func (z *Zone) Activate() {
-	z.controllers = make(map[string]LimitController)
+func NewZone(host string, shared bool, control string, limit int) *Zone {
+	return &Zone{host, shared, control, limit, make(map[string]LimitController)}
 }
 
 func (z *Zone) GetController(host string) LimitController {
@@ -26,9 +26,7 @@ func (z *Zone) GetController(host string) LimitController {
 		var controller LimitController
 		switch z.Control {
 		case "rps":
-			controller = &RPSControl{
-				Limit: z.Limit,
-			}
+			controller = NewRPSControl(z.Limit)
 		}
 
 		z.controllers[key] = controller
