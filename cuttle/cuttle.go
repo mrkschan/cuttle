@@ -29,15 +29,18 @@ func main() {
 	viper.SetDefault("zones", defaults)
 
 	configs := viper.Get("zones").([]interface{})
-	metas := make([]Meta, len(configs))
+	zones := make([]Zone, len(configs))
 	for i, v := range configs {
 		config := v.(map[interface{}]interface{})
-		metas[i] = Meta{
+		zone := Zone{
 			Host:    config["host"].(string),
 			Shared:  config["shared"].(bool),
 			Control: config["control"].(string),
 			Limit:   config["limit"].(int),
 		}
+		zone.Activate()
+
+		zones[i] = zone
 	}
 
 	// // Config limit controller.
