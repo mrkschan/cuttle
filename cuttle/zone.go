@@ -3,6 +3,8 @@ package main
 import (
 	"regexp"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type Zone struct {
@@ -37,6 +39,8 @@ func (z *Zone) MatchHost(host string) bool {
 }
 
 func (z *Zone) GetController(host string) LimitController {
+	log.Debugf("Zone.GetController: zone - %s, host - %s, control - %s", z.Host, host, z.Control)
+
 	var key string
 	if z.Shared {
 		key = "*"
@@ -55,6 +59,7 @@ func (z *Zone) GetController(host string) LimitController {
 		z.controllers[key] = controller
 		controller.Start()
 	}
+	log.Debugf("Zone.GetController: control selected. zone - %s, key - %s, control - %s", z.Host, key, z.Control)
 
 	return z.controllers[key]
 }

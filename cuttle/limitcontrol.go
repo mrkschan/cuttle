@@ -29,17 +29,20 @@ func NewRPSControl(limit int) *RPSControl {
 // Start running RPSControl.
 func (c *RPSControl) Start() {
 	go func() {
+		log.Debugf("RPSControl: activated.")
+
 		for {
 			<-c.pendingChan
 
+			log.Debugf("RPSControl: limit - %d", c.Limit)
 			if c.seen.Len() == c.Limit {
 				front := c.seen.Front()
 				nanoElapsed := time.Now().UnixNano() - front.Value.(int64)
 				milliElapsed := nanoElapsed / int64(time.Millisecond)
-				log.Debug("RPS control: ", "elapsed=", milliElapsed)
+				log.Debugf("RPSControl: elapsed - %dms", milliElapsed)
 
 				if waitTime := 1000 - milliElapsed; waitTime > 0 {
-					log.Debug("RPS control: ", "wait=", waitTime)
+					log.Debugf("RPSControl: waiting - %dms", waitTime)
 					time.Sleep(time.Duration(waitTime) * time.Millisecond)
 				}
 
@@ -49,11 +52,15 @@ func (c *RPSControl) Start() {
 
 			c.readyChan <- 1
 		}
+
+		log.Debugf("RPSControl: deactivated.")
 	}()
 }
 
 // Acquire permission to forward request from RPSControl.
 func (c *RPSControl) Acquire() {
+	log.Debugf("RPSControl: permission requested.")
 	c.pendingChan <- 1
 	<-c.readyChan
+	log.Debugf("RPSControl: permission granted.")
 }
