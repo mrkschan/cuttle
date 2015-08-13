@@ -63,7 +63,7 @@ func main() {
 	//
 	// proxy.OnRequest().DoFunc(
 	// 	func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-	// 		// Acquire permission to forward request to downstream.
+	// 		// Acquire permission to forward request to upstream server.
 	// 		controller.Acquire()
 	//
 	// 		return r, nil // Forward request.
