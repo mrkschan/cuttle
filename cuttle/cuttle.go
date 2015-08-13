@@ -40,34 +40,28 @@ func main() {
 		)
 	}
 
-	// // Config limit controller.
-	// var controller LimitController
-	// control := viper.GetString("limitcontrol.controller")
-	// if control == "rps" {
-	// 	limit := viper.GetInt("limitcontrol.limit")
-	// 	controller = &RPSControl{
-	// 		Limit: limit,
-	// 	}
-	// } else {
-	// 	log.Fatal("Unknown limit control: ", control)
-	// }
-	//
 	// Config proxy.
 	addr := viper.GetString("addr")
 	verbose := viper.GetBool("verbose")
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = verbose
 
-	// Starts now.
-	// controller.Start()
-	//
-	// proxy.OnRequest().DoFunc(
-	// 	func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-	// 		// Acquire permission to forward request to upstream server.
-	// 		controller.Acquire()
-	//
-	// 		return r, nil // Forward request.
-	// 	})
+	proxy.OnRequest().DoFunc(
+		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+			for _, zone := range zones {
+				if !zone.MatchHost(r.URL.Host) {
+					continue
+				}
+
+				// Acquire permission to forward request to upstream server.
+				zone.GetController(r.URL.Host).Acquire()
+
+				return r, nil // Forward request.
+			}
+
+			log.Warn("No zone is applied. - ", r.URL)
+			return r, nil // Forward request without rate limit.
+		})
 
 	log.Fatal(http.ListenAndServe(addr, proxy))
 }
