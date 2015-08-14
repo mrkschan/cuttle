@@ -51,9 +51,12 @@ func (z *Zone) GetController(host string) LimitController {
 	_, ok := z.controllers[key]
 	if !ok {
 		var controller LimitController
+
 		switch z.Control {
 		case "rps":
 			controller = NewRPSControl(z.Limit)
+		case "noop":
+			controller = NewNoopControl()
 		}
 
 		z.controllers[key] = controller

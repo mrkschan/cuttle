@@ -5,6 +5,24 @@ import (
 	"time"
 )
 
+func TestNoopControl(t *testing.T) {
+	var control LimitController
+	var startT, endT int64
+
+	control = NewNoopControl()
+	control.Start()
+
+	startT = time.Now().UnixNano()
+	control.Acquire() // Expect no wait time.
+	control.Acquire() // Expect no wait time.
+	endT = time.Now().UnixNano()
+
+	// Expecting no delay in 2 consecutive Acquire().
+	if elapsed := (endT - startT) / int64(time.Millisecond); elapsed > 1 {
+		t.Errorf("2x NoopControl.Acquire() elapsed %dms, want %dms", elapsed, 0)
+	}
+}
+
 func TestRPSControl(t *testing.T) {
 	var control LimitController
 	var startT, endT int64

@@ -12,6 +12,22 @@ type LimitController interface {
 	Acquire()
 }
 
+// NoopControl does not do any rate limit.
+type NoopControl struct {
+}
+
+func NewNoopControl() *NoopControl {
+	return &NoopControl{}
+}
+
+// Start running NoopControl.
+func (c *NoopControl) Start() {
+}
+
+// Acquire permission to forward request from NoopControl.
+func (c *NoopControl) Acquire() {
+}
+
 // RPSControl provides requests per second rate limit control.
 type RPSControl struct {
 	// Limit holds the number of requests per second.
