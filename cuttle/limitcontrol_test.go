@@ -9,7 +9,7 @@ func TestNoopControl(t *testing.T) {
 	var control LimitController
 	var startT, endT int64
 
-	control = NewNoopControl()
+	control = NewNoopControl("label")
 	control.Start()
 
 	startT = time.Now().UnixNano()
@@ -27,7 +27,7 @@ func TestRPSControl(t *testing.T) {
 	var control LimitController
 	var startT, endT int64
 
-	control = NewRPSControl(2)
+	control = NewRPSControl("label", 2)
 	control.Start()
 
 	startT = time.Now().UnixNano()
@@ -40,7 +40,7 @@ func TestRPSControl(t *testing.T) {
 		t.Errorf("2x RPSControl.Acquire() elapsed %dms, want %dms", elapsed, 0)
 	}
 
-	control = NewRPSControl(2)
+	control = NewRPSControl("label", 2)
 	control.Start()
 
 	startT = time.Now().UnixNano()
@@ -56,7 +56,7 @@ func TestRPSControl(t *testing.T) {
 		t.Errorf("3x RPSControl.Acquire() elapsed %dms, want > %dms", elapsed, 1000)
 	}
 
-	control = NewRPSControl(2)
+	control = NewRPSControl("label", 2)
 	control.Start()
 
 	startT = time.Now().UnixNano()

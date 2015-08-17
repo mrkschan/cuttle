@@ -39,8 +39,6 @@ func (z *Zone) MatchHost(host string) bool {
 }
 
 func (z *Zone) GetController(host string) LimitController {
-	log.Debugf("Zone.GetController: zone - %s, host - %s, control - %s", z.Host, host, z.Control)
-
 	var key string
 	if z.Shared {
 		key = "*"
@@ -54,15 +52,15 @@ func (z *Zone) GetController(host string) LimitController {
 
 		switch z.Control {
 		case "rps":
-			controller = NewRPSControl(z.Limit)
+			controller = NewRPSControl(key, z.Limit)
 		case "noop":
-			controller = NewNoopControl()
+			controller = NewNoopControl(key)
 		}
 
 		z.controllers[key] = controller
 		controller.Start()
 	}
-	log.Debugf("Zone.GetController: control selected. zone - %s, key - %s, control - %s", z.Host, key, z.Control)
+	log.Debugf("Zone.GetController: zone - %s, key - %s, control - %s", z.Host, key, z.Control)
 
 	return z.controllers[key]
 }
