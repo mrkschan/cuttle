@@ -65,7 +65,7 @@ func (c *RPSControl) Start() {
 				log.Debugf("RPSControl[%s]: Elapsed %dms since first request.", c.Label, milliElapsed)
 
 				if waitTime := 1000 - milliElapsed; waitTime > 0 {
-					log.Debugf("RPSControl[%s]: Waiting for %dms.", c.Label, waitTime)
+					log.Infof("RPSControl[%s]: Waiting for %dms.", c.Label, waitTime)
 					time.Sleep(time.Duration(waitTime) * time.Millisecond)
 				}
 

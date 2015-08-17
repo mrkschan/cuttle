@@ -3,6 +3,7 @@ package main
 import (
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
@@ -10,8 +11,20 @@ import (
 )
 
 func main() {
-	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
+
+	switch os.Getenv("LOGLEVEL") {
+	case "DEBUG":
+		log.SetLevel(log.DebugLevel)
+	case "INFO":
+		log.SetLevel(log.InfoLevel)
+	case "WARNING", "WARN":
+		log.SetLevel(log.WarnLevel)
+	case "ERROR", "ERR", "FATAL":
+		log.SetLevel(log.ErrorLevel)
+	default:
+		log.SetLevel(log.InfoLevel)
+	}
 
 	filename := "cuttle.yml"
 	bytes, err := ioutil.ReadFile(filename)
