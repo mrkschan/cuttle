@@ -1,50 +1,39 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
-	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
 
-	viper.SetConfigType("yaml")
-	viper.SetConfigName("cuttle")
-	viper.AddConfigPath("/etc/cuttle/")
-
-	err := viper.ReadInConfig()
+	filename := "cuttle.yml"
+	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Error("Failed to load config from 'cuttle.yml'.")
+		log.Errorf("Failed to load configuration from %s.", filename)
 		log.Fatal(err)
 	}
 
-	viper.SetDefault("addr", ":8123")
-	viper.SetDefault("verbose", false)
+	var cfg Config
+	if err := yaml.Unmarshal(bytes, &cfg); err != nil {
+		log.Errorf("Malformed YAML in %s.", filename)
+		log.Fatal(err)
+	}
 
-	defaults := []map[string]interface{}{{"host": "*", "shared": true, "control": "noop"}}
-	viper.SetDefault("zones", defaults)
-
-	configs := viper.Get("zones").([]interface{})
-	zones := make([]Zone, len(configs))
-	for i, v := range configs {
-		config := v.(map[interface{}]interface{})
-		zones[i] = *NewZone(
-			config["host"].(string),
-			config["shared"].(bool),
-			config["control"].(string),
-			config["limit"].(int),
-		)
+	zones := make([]Zone, len(cfg.Zones))
+	for i, c := range cfg.Zones {
+		zones[i] = *NewZone(c.Host, c.Shared, c.Control, c.Limit)
 	}
 
 	// Config proxy.
-	addr := viper.GetString("addr")
-	verbose := viper.GetBool("verbose")
 	proxy := goproxy.NewProxyHttpServer()
-	proxy.Verbose = verbose
+	proxy.Verbose = cfg.Verbose
 
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -63,5 +52,19 @@ func main() {
 			return r, nil // Forward request without rate limit.
 		})
 
-	log.Fatal(http.ListenAndServe(addr, proxy))
+	log.Fatal(http.ListenAndServe(cfg.Addr, proxy))
+}
+
+type Config struct {
+	Addr    string
+	Verbose bool
+
+	Zones []ZoneConfig
+}
+
+type ZoneConfig struct {
+	Host    string
+	Shared  bool
+	Control string
+	Limit   int
 }
