@@ -36,30 +36,32 @@ func main() {
 
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			for _, zone := range zones {
-				if !zone.MatchHost(r.URL.Host) {
-					continue
+			var zone *Zone
+			for _, z := range zones {
+				if z.MatchHost(r.URL.Host) {
+					zone = &z
+					break
 				}
-
-				// Acquire permission to forward request to upstream server.
-				zone.GetController(r.URL.Host).Acquire()
-
-				// Forward request.
-				log.Infof("Main: Forwarding request to %s", r.URL)
-				return r, nil
 			}
 
-			// Forward request without rate limit.
-			log.Warnf("Main: No zone is applied to %s", r.URL)
+			if zone != nil {
+				// Acquire permission to forward request to upstream server.
+				zone.GetController(r.URL.Host).Acquire()
+			} else {
+				// No rate limit applied.
+				log.Warnf("Main: No zone is applied to %s", r.URL)
+			}
+
+			// Forward request.
 			log.Infof("Main: Forwarding request to %s", r.URL)
 			return r, nil
 		})
 
-	log.Fatal(http.ListenAndServe(cfg.Addr, proxy))
+	log.Fatalln(http.ListenAndServe(cfg.Addr, proxy))
 }
 
 type Config struct {
-	Addr    string
+	Addr string
 
 	Zones []ZoneConfig
 }
