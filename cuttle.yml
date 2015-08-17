@@ -1,6 +1,5 @@
 # Address format from golang.org/pkg/net/http, default ":8123".
 addr: :8123
-verbose: true
 
 # List of rate limit zones identified by their "host" field.
 # 'Host' header of the HTTP request is matched with each of these "host" fields.

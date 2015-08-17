@@ -33,7 +33,6 @@ func main() {
 
 	// Config proxy.
 	proxy := goproxy.NewProxyHttpServer()
-	proxy.Verbose = cfg.Verbose
 
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -45,11 +44,15 @@ func main() {
 				// Acquire permission to forward request to upstream server.
 				zone.GetController(r.URL.Host).Acquire()
 
-				return r, nil // Forward request.
+				// Forward request.
+				log.Infof("Main: Forwarding request to %s", r.URL)
+				return r, nil
 			}
 
-			log.Warn("No zone is applied. - ", r.URL)
-			return r, nil // Forward request without rate limit.
+			// Forward request without rate limit.
+			log.Warnf("Main: No zone is applied to %s", r.URL)
+			log.Infof("Main: Forwarding request to %s", r.URL)
+			return r, nil
 		})
 
 	log.Fatal(http.ListenAndServe(cfg.Addr, proxy))
@@ -57,7 +60,6 @@ func main() {
 
 type Config struct {
 	Addr    string
-	Verbose bool
 
 	Zones []ZoneConfig
 }
