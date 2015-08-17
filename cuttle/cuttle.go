@@ -20,7 +20,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var cfg Config
+	cfg := Config{Addr: ":8123"}
 	if err := yaml.Unmarshal(bytes, &cfg); err != nil {
 		log.Errorf("Malformed YAML in %s.", filename)
 		log.Fatal(err)
