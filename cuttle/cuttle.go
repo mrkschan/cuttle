@@ -74,6 +74,7 @@ func main() {
 			return r, nil
 		})
 
+	log.Infof("Listening on %s", cfg.Addr)
 	log.Fatalln(http.ListenAndServe(cfg.Addr, proxy))
 }
 
