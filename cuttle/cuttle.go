@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -26,7 +27,10 @@ func main() {
 		log.SetLevel(log.InfoLevel)
 	}
 
-	filename := "cuttle.yml"
+	filename := "./cuttle.yml"
+	flag.StringVar(&filename, "f", filename, "Configuration file to be loaded.")
+	flag.Parse()
+
 	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Errorf("Failed to load configuration from %s.", filename)
