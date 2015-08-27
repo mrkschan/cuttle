@@ -37,16 +37,16 @@ func (c *NoopControl) Acquire() {
 type RPSControl struct {
 	// Label of this control.
 	Label string
-	// Limit holds the number of requests per second.
-	Limit int
+	// Rate holds the number of requests per second.
+	Rate int
 
 	pendingChan chan uint
 	readyChan   chan uint
 	seen        *list.List
 }
 
-func NewRPSControl(label string, limit int) *RPSControl {
-	return &RPSControl{label, limit, make(chan uint), make(chan uint), list.New()}
+func NewRPSControl(label string, rate int) *RPSControl {
+	return &RPSControl{label, rate, make(chan uint), make(chan uint), list.New()}
 }
 
 // Start running RPSControl.
@@ -57,8 +57,8 @@ func (c *RPSControl) Start() {
 		for {
 			<-c.pendingChan
 
-			log.Debugf("RPSControl[%s]: Limited at %dreq/s.", c.Label, c.Limit)
-			if c.seen.Len() == c.Limit {
+			log.Debugf("RPSControl[%s]: Limited at %dreq/s.", c.Label, c.Rate)
+			if c.seen.Len() == c.Rate {
 				front := c.seen.Front()
 				nanoElapsed := time.Now().UnixNano() - front.Value.(int64)
 				milliElapsed := nanoElapsed / int64(time.Millisecond)

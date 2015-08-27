@@ -35,7 +35,7 @@ func TestRPSControl(t *testing.T) {
 	control.Acquire() // Expect no wait time.
 	endT = time.Now().UnixNano()
 
-	// Expecting no delay in 2 consecutive Acquire() with Limit=2.
+	// Expecting no delay in 2 consecutive Acquire() with Rate=2.
 	if elapsed := (endT - startT) / int64(time.Millisecond); elapsed > 1000 {
 		t.Errorf("2x RPSControl.Acquire() elapsed %dms, want %dms", elapsed, 0)
 	}
@@ -51,7 +51,7 @@ func TestRPSControl(t *testing.T) {
 	control.Acquire() // Expect 200ms wait time.
 	endT = time.Now().UnixNano()
 
-	// Expecting delay in 3 consecutive Acquire() with Limit=2.
+	// Expecting delay in 3 consecutive Acquire() with Rate=2.
 	if elapsed := (endT - startT) / int64(time.Millisecond); elapsed < 1000 {
 		t.Errorf("3x RPSControl.Acquire() elapsed %dms, want > %dms", elapsed, 1000)
 	}
@@ -69,7 +69,7 @@ func TestRPSControl(t *testing.T) {
 	control.Acquire() // Expect 100ms wait time.
 	endT = time.Now().UnixNano()
 
-	// Expecting delay in 4 consecutive Acquire() with Limit=2.
+	// Expecting delay in 4 consecutive Acquire() with Rate=2.
 	if elapsed := (endT - startT) / int64(time.Millisecond); elapsed < 1500 {
 		t.Errorf("4x RPSControl.Acquire() elapsed %dms, want > %dms", elapsed, 1500)
 	}

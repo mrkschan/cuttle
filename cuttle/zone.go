@@ -11,18 +11,18 @@ type Zone struct {
 	Host    string
 	Shared  bool
 	Control string
-	Limit   int
+	Rate    int
 
 	controllers map[string]LimitController
 	re          string
 }
 
-func NewZone(host string, shared bool, control string, limit int) *Zone {
+func NewZone(host string, shared bool, control string, rate int) *Zone {
 	re := strings.Replace(host, ".", "\\.", -1)
 	re = strings.Replace(host, "*", "[^\\.]+", -1)
 
 	return &Zone{
-		host, shared, control, limit,
+		host, shared, control, rate,
 		make(map[string]LimitController), re,
 	}
 }
@@ -52,7 +52,7 @@ func (z *Zone) GetController(host string) LimitController {
 
 		switch z.Control {
 		case "rps":
-			controller = NewRPSControl(key, z.Limit)
+			controller = NewRPSControl(key, z.Rate)
 		case "noop":
 			controller = NewNoopControl(key)
 		}

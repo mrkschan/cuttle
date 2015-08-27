@@ -45,7 +45,7 @@ func main() {
 
 	zones := make([]Zone, len(cfg.Zones))
 	for i, c := range cfg.Zones {
-		zones[i] = *NewZone(c.Host, c.Shared, c.Control, c.Limit)
+		zones[i] = *NewZone(c.Host, c.Shared, c.Control, c.Rate)
 	}
 
 	// Config proxy.
@@ -88,5 +88,5 @@ type ZoneConfig struct {
 	Host    string
 	Shared  bool
 	Control string
-	Limit   int
+	Rate    int
 }

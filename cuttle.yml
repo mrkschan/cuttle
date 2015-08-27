@@ -1,23 +1,24 @@
-# Address format from golang.org/pkg/net/http, default ":3128".
+# Address format from golang.org/pkg/net/http, default ':3128'.
 addr: :3128
 
-# List of rate limit zones identified by their "host" field.
-# 'Host' header of the HTTP request is matched with each of these "host" fields.
+# List of rate limit zones identified by their 'host' field.
+# 'Host' header of the HTTP request is matched with each of these 'host' fields.
 # Rate limit control of the first matched zone in the list will be applied to
 # the HTTP request.
 zones:
   - host: "*"  # Apply to requests forwarded to all domains.
     shared: true  # The rate limit is shared by all domains.
     control: rps  # Use request-per-second rate limit control.
-    limit: 2  # At most 2 requests per second in the entire zone.
+    rate: 2  # At most 2 requests per second in the entire zone.
 
-# Example - Throttle *.github.com and other domains with different settings.
+# Example - Only throttle *.github.com and no rate limit on other domains.
 #
 # zones:
 # - host: "*.github.com"  # Apply to requests forwarded to all sub-domains of github.com.
 #   shared: false  # The rate limit is applied to each sub-domain separately.
 #   control: rps  # Use request-per-second rate limit control.
-#   limit: 3  # At most 3 requests per second forwarded per each sub-domain.
+#   rate: 3  # At most 3 requests per second forwarded per each sub-domain.
 # - host: "*"  # Apply to all requests forwarded to non- github.com.
-#   shared: true  # The rate limit is shared by all domains.
 #   control: noop  # Use no-op control, i.e., no rate limit.
+#
+# NOTE: Default value of 'shared' is 'false'.
