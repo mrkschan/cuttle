@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -14,23 +15,23 @@ type Zone struct {
 	Rate    int
 
 	controllers map[string]LimitController
-	re          string
 }
 
 func NewZone(host string, shared bool, control string, rate int) *Zone {
-	re := strings.Replace(host, ".", "\\.", -1)
-	re = strings.Replace(host, "*", "[^\\.]+", -1)
-
 	return &Zone{
 		host, shared, control, rate,
-		make(map[string]LimitController), re,
+		make(map[string]LimitController),
 	}
 }
 
 func (z *Zone) MatchHost(host string) bool {
 	log.Debugf("Zone.MatchHost: zone - %s, host - %s", z.Host, host)
 
-	matched, err := regexp.MatchString(z.re, host)
+	pattern := z.Host
+	pattern = strings.Replace(pattern, ".", "\\.", -1)
+	pattern = strings.Replace(pattern, "*", "[^\\.]+", -1)
+
+	matched, err := regexp.MatchString(fmt.Sprintf("^%s", pattern), host)
 	if err != nil {
 		log.Warn(err)
 		return false

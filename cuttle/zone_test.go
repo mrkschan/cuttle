@@ -41,7 +41,7 @@ func TestZone(t *testing.T) {
 	if !zone.MatchHost("github.com") {
 		t.Errorf("zone(%s).MatchHost(%s) should be %s", "github.com", "github.com", true)
 	}
-	if !zone.MatchHost("www.github.com") {
+	if zone.MatchHost("www.github.com") {
 		t.Errorf("zone(%s).MatchHost(%s) should be %s", "github.com", "www.github.com", false)
 	}
 
@@ -60,7 +60,7 @@ func TestZone(t *testing.T) {
 	if !zone.MatchHost("x.www.github.com") {
 		t.Errorf("zone(%s).MatchHost(%s) should be %s", "*.*.github.com", "x.www.github.com", true)
 	}
-	if !zone.MatchHost("www.github.com") {
+	if zone.MatchHost("www.github.com") {
 		t.Errorf("zone(%s).MatchHost(%s) should be %s", "*.*.github.com", "www.github.com", false)
 	}
 	if zone.MatchHost("github.com") {
