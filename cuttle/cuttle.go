@@ -45,7 +45,18 @@ func main() {
 
 	zones := make([]Zone, len(cfg.Zones))
 	for i, c := range cfg.Zones {
-		zones[i] = *NewZone(c.Host, c.Shared, c.Control, c.Rate)
+		if c.Path == "" {
+			c.Path = "/"
+		}
+
+		if c.LimitBy == "" {
+			c.LimitBy = "host"
+		}
+
+		log.Debugf("ZoneConfig: host - %s, path - %s, limitby - %s, shared - %t, control - %s, rate - %d",
+			c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
+
+		zones[i] = *NewZone(c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
 	}
 
 	// Config proxy.
@@ -55,7 +66,7 @@ func main() {
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			var zone *Zone
 			for _, z := range zones {
-				if z.MatchHost(r.URL.Host) {
+				if z.MatchHost(r.URL.Host) && z.MatchPath(r.URL.Path) {
 					zone = &z
 					break
 				}
@@ -63,7 +74,7 @@ func main() {
 
 			if zone != nil {
 				// Acquire permission to forward request to upstream server.
-				zone.GetController(r.URL.Host).Acquire()
+				zone.GetController(r.URL.Host, r.URL.Path).Acquire()
 			} else {
 				// No rate limit applied.
 				log.Warnf("Main: No zone is applied to %s", r.URL)
@@ -86,6 +97,8 @@ type Config struct {
 
 type ZoneConfig struct {
 	Host    string
+	Path    string // Optional, default "/"
+	LimitBy string // Optional, default "host"
 	Shared  bool   // Optional, default "false"
 	Control string
 	Rate    int

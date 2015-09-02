@@ -23,3 +23,26 @@ zones:
 #
 # NOTE: Default value of 'shared' is false.
 # NOTE: 'rate' is not required for noop control.
+
+
+# Example - Throttle requests by URL path under github.com.
+#
+# zones:
+# - host: "github.com"
+#   path: "/*"  # Apply to requests under github.com/, including '/'.
+#   limitby: "path"  # Limit requests by URL path, instead of host.
+#   shared: true  # The rate limit is applied to all URL paths.
+#   control: rps  # Use request-per-second rate limit control.
+#   rate: 2  # At most 2 requests per second forwarded per URL path.
+# - host: "api.github.com"
+#   path: "/users/*"  # Apply to requests under api.github.com/users/, including '/users/'.
+#   limitby: "path"  # Limit requests by URL path, instead of host.
+#   shared: false  # The rate limit is applied to each URL path separately.
+#   control: rps  # Use request-per-second rate limit control.
+#   rate: 2  # At most 2 requests per second forwarded.
+# - host: "*"  # Apply to all other requests.
+#   control: noop  # Use no-op control, i.e., no rate limit.
+#
+# NOTE: Wildcard '*' can only be applied to the field specified in 'limitby'.
+# NOTE: Default value of 'path' is '/'.
+# NOTE: Default value of 'limitby' is 'host'.
