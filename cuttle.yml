@@ -15,10 +15,11 @@ zones:
 #
 # zones:
 # - host: "*.github.com"  # Apply to requests forwarded to all sub-domains of github.com.
-#   shared: false  # The rate limit is applied to each sub-domain separately.
+#   shared: false  # The rate limit is applied to each sub-domain of github.com separately.
 #   control: rps  # Use request-per-second rate limit control.
 #   rate: 3  # At most 3 requests per second forwarded per each sub-domain.
 # - host: "*"  # Apply to all requests forwarded to non- github.com.
 #   control: noop  # Use no-op control, i.e., no rate limit.
 #
-# NOTE: Default value of 'shared' is 'false'.
+# NOTE: Default value of 'shared' is false.
+# NOTE: 'rate' is not required for noop control.

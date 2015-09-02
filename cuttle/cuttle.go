@@ -79,14 +79,14 @@ func main() {
 }
 
 type Config struct {
-	Addr string
+	Addr string // Optional, default ":3128"
 
 	Zones []ZoneConfig
 }
 
 type ZoneConfig struct {
 	Host    string
-	Shared  bool
+	Shared  bool   // Optional, default "false"
 	Control string
 	Rate    int
 }
