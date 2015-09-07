@@ -62,6 +62,7 @@ func main() {
 	// Config proxy.
 	proxy := goproxy.NewProxyHttpServer()
 
+	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			var zone *Zone
