@@ -1,0 +1,11 @@
+addr: :3128
+
+zones:
+  # Google Maps Geocoding API, 10 requests per second
+  - host: "maps.googleapis.com"
+    shared: true
+    control: rps
+    rate: 10
+  - host: "*"
+    shared: true
+    control: noop
