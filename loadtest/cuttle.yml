@@ -1,11 +1,14 @@
 addr: :3128
 
 zones:
-  # Google Maps Geocoding API, 10 requests per second
+  # Google Maps Geocoding API, 10 requests per second.
+  # Due to network latency, pure client side rate limiting may not meet
+  # the rate limit control on the server.  Thus, 9 requests per second is
+  # selected as a workaround for this limitation.
   - host: "maps.googleapis.com"
     shared: true
     control: rps
-    rate: 10
+    rate: 9
   - host: "*"
     shared: true
     control: noop
