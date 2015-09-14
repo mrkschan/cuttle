@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cfg := Config{Addr: ":3128"}
+	cfg := Config{Addr: ":3128", CACert: "", CAKey: ""}
 	if err := yaml.Unmarshal(bytes, &cfg); err != nil {
 		log.Errorf("Malformed YAML in %s.", filename)
 		log.Fatal(err)
@@ -60,6 +60,15 @@ func main() {
 		zones[i] = *NewZone(c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
 	}
 
+	// Config CA Cert.
+	cert := goproxy.GoproxyCa // Use goproxy CA as default
+	if cfg.CACert != "" && cfg.CAKey != "" {
+		cert, err = tls.LoadX509KeyPair(cfg.CACert, cfg.CAKey)
+		if err != nil {
+			log.Warnf("Cannot load CA certificate from %s and %s.", cfg.CACert, cfg.CAKey)
+		}
+	}
+
 	// Config proxy.
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Tr = &http.Transport{
@@ -67,7 +76,14 @@ func main() {
 		Proxy:           http.ProxyFromEnvironment,
 	}
 
-	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
+	var httpsHandler goproxy.FuncHttpsHandler = func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
+		action := &goproxy.ConnectAction{
+			Action:    goproxy.ConnectMitm,
+			TLSConfig: goproxy.TLSConfigFromCA(&cert),
+		}
+		return action, host
+	}
+	proxy.OnRequest().HandleConnect(httpsHandler)
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			var zone *Zone
@@ -96,7 +112,9 @@ func main() {
 }
 
 type Config struct {
-	Addr string // Optional, default ":3128"
+	Addr   string // Optional, default ":3128"
+	CACert string // Optional, default ""
+	CAKey  string // Optional, default ""
 
 	Zones []ZoneConfig
 }
