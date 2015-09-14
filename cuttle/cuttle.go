@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"flag"
 	"io/ioutil"
 	"net/http"
@@ -61,6 +62,10 @@ func main() {
 
 	// Config proxy.
 	proxy := goproxy.NewProxyHttpServer()
+	proxy.Tr = &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: false}, // Enforce TLS cert verification.
+		Proxy:           http.ProxyFromEnvironment,
+	}
 
 	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 	proxy.OnRequest().DoFunc(
