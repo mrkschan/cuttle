@@ -12,8 +12,6 @@ def generate_load(urls, thread_count)
   threads = thread_count.times.map do
     Thread.new do
       while !queue.empty? && url = queue.pop
-        # TODO(mrkschan): Should not use `curl -k`
-        # Ref - https://github.com/elazarl/goproxy/issues/73
         res = `curl -k -s "#{url}"`
         if res.include? 'OVER_QUERY_LIMIT'
           logger.warn "#{url} - #{res}"
