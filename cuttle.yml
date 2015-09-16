@@ -1,7 +1,11 @@
 # Address format from golang.org/pkg/net/http, default ':3128'.
 addr: :3128
+
 # cacert: './cert.pem'  # Optional. CA cert used for TLS between user and cuttle.
 # cakey: './key.pem'  # Optional. CA private key used for TLS between user and cuttle.
+
+# tlsverify: false  # Turn off TLS cert verification for upstream servers.
+#                   # IMPORTANT: Use this option carefully.
 
 # List of rate limit zones identified by their 'host' field.
 # 'Host' header of the HTTP request is matched with each of these 'host' fields.

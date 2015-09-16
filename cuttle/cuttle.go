@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cfg := Config{Addr: ":3128", CACert: "", CAKey: ""}
+	cfg := Config{Addr: ":3128", CACert: "", CAKey: "", TLSVerify: true}
 	if err := yaml.Unmarshal(bytes, &cfg); err != nil {
 		log.Errorf("Malformed YAML in %s.", filename)
 		log.Fatal(err)
@@ -72,7 +72,8 @@ func main() {
 	// Config proxy.
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Tr = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: false}, // Enforce TLS cert verification.
+		// Config TLS cert verification.
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: !cfg.TLSVerify},
 		Proxy:           http.ProxyFromEnvironment,
 	}
 
@@ -112,9 +113,10 @@ func main() {
 }
 
 type Config struct {
-	Addr   string // Optional, default ":3128"
-	CACert string // Optional, default ""
-	CAKey  string // Optional, default ""
+	Addr      string // Optional, default ":3128"
+	CACert    string // Optional, default ""
+	CAKey     string // Optional, default ""
+	TLSVerify bool   // Optional, default "true"
 
 	Zones []ZoneConfig
 }
