@@ -25,7 +25,7 @@ end
 
 
 if __FILE__ == $0
-  googleapis_key = 'AIzaSyCQ1dg6d95v88xorMRFUrLw1vGi8j8_l3Y'
+  googleapis_key = ENV['APIKEY']
   urls = ["https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=#{googleapis_key}",
           "https://maps.googleapis.com/maps/api/geocode/json?address=White+House&key=#{googleapis_key}",
           "https://maps.googleapis.com/maps/api/geocode/json?address=Google&key=#{googleapis_key}",
