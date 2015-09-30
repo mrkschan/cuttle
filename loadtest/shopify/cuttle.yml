@@ -1,0 +1,13 @@
+addr: :3128
+
+zones:
+  # Shopify API use leaky bucket algorithm that has a max size of 40
+  # with a refill rate of 2 calls per second.
+  # When the bucket is empty, HTTP 429 is returned.
+  - host: "*.myshopify.com"
+    shared: false
+    control: rps
+    rate: 2
+  - host: "*"
+    shared: true
+    control: noop
