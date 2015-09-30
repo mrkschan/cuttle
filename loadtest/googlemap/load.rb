@@ -14,7 +14,7 @@ def generate_load(urls, thread_count)
       while !queue.empty? && url = queue.pop
         res = `curl -k -s "#{url}"`
         if res.include? 'OVER_QUERY_LIMIT'
-          logger.warn "#{url} - #{res}"
+          logger.warn "#{res}"
         end
       end
     end
@@ -25,11 +25,11 @@ end
 
 
 if __FILE__ == $0
-  googleapis_key = ENV['APIKEY']
-  urls = ["https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=#{googleapis_key}",
-          "https://maps.googleapis.com/maps/api/geocode/json?address=White+House&key=#{googleapis_key}",
-          "https://maps.googleapis.com/maps/api/geocode/json?address=Google&key=#{googleapis_key}",
-          "https://maps.googleapis.com/maps/api/geocode/json?address=Apple&key=#{googleapis_key}",
+  api_key = ENV['API_KEY']
+  urls = ["https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=#{api_key}",
+          "https://maps.googleapis.com/maps/api/geocode/json?address=White+House&key=#{api_key}",
+          "https://maps.googleapis.com/maps/api/geocode/json?address=Google&key=#{api_key}",
+          "https://maps.googleapis.com/maps/api/geocode/json?address=Apple&key=#{api_key}",
           ]
   generate_load(urls * 32, 32)
 end
