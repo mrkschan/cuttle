@@ -12,6 +12,8 @@ GOPATH=`pwd` go get github.com/mrkschan/cuttle
 bin/cuttle -f src/github.com/mrkschan/cuttle/cuttle.yml
 ```
 
+Read `cuttle.yml` for available configurations.
+
 
 What is Cuttle designed for?
 ----------------------------
