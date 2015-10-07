@@ -1,2 +1,2 @@
 #!/bin/bash
-find cuttle/ -type f -not -path "*_test*" | xargs --verbose gom run
+GO15VENDOREXPERIMENT=1 go run main.go

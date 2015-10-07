@@ -1,2 +1,2 @@
 #!/bin/bash
-gom test -v cuttle/*
+GO15VENDOREXPERIMENT=1 go test ./cuttle/

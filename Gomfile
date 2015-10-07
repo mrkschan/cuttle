@@ -1,3 +1,0 @@
-gom "github.com/Sirupsen/logrus"
-gom "github.com/elazarl/goproxy"
-gom "gopkg.in/yaml.v2"

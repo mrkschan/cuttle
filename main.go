@@ -10,6 +10,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
 	"gopkg.in/yaml.v2"
+
+    "github.com/mrkschan/cuttle-proxy/cuttle"
 )
 
 func main() {
@@ -44,7 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	zones := make([]Zone, len(cfg.Zones))
+	zones := make([]cuttle.Zone, len(cfg.Zones))
 	for i, c := range cfg.Zones {
 		if c.Path == "" {
 			c.Path = "/"
@@ -57,7 +59,7 @@ func main() {
 		log.Debugf("ZoneConfig: host - %s, path - %s, limitby - %s, shared - %t, control - %s, rate - %d",
 			c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
 
-		zones[i] = *NewZone(c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
+		zones[i] = *cuttle.NewZone(c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
 	}
 
 	// Config CA Cert.
@@ -87,7 +89,7 @@ func main() {
 	proxy.OnRequest().HandleConnect(httpsHandler)
 	proxy.OnRequest().DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			var zone *Zone
+			var zone *cuttle.Zone
 			for _, z := range zones {
 				if z.MatchHost(r.URL.Host) && z.MatchPath(r.URL.Path) {
 					zone = &z

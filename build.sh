@@ -1,4 +1,2 @@
 #!/bin/bash
-DIR=$1
-echo "gom build -o bin/cuttle cuttle/*"
-gom build -o bin/cuttle cuttle/*
+GO15VENDOREXPERIMENT=1 go build -o bin/cuttle main.go

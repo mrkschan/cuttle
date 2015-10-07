@@ -1,0 +1,5 @@
+package: main
+import:
+  - package: github.com/elazarl/goproxy
+  - package: github.com/Sirupsen/logrus
+  - package: gopkg.in/yaml.v2

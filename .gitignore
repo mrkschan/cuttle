@@ -23,8 +23,8 @@ _testmain.go
 *.test
 *.prof
 
-# gom
-_vendor/
+# Go 1.5+
+vendor/
 
-# build
+# build.sh
 bin/

@@ -1,4 +1,4 @@
-package main
+package cuttle
 
 import (
 	"container/list"
