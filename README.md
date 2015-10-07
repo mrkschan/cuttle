@@ -4,6 +4,15 @@ cuttle
 Cuttle is a HTTP forward proxy designed for HTTP clients who need to respect rate limit. Its primary use case is to serve as the centralized outbound rate limit controller for API clients.
 
 
+Quickstart
+----------
+
+```
+GOPATH=`pwd` go get github.com/mrkschan/cuttle
+bin/cuttle -f src/github.com/mrkschan/cuttle/cuttle.yml
+```
+
+
 What is Cuttle designed for?
 ----------------------------
 
