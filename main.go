@@ -9,9 +9,9 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/elazarl/goproxy"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 
-    "github.com/mrkschan/cuttle/cuttle"
+	"github.com/mrkschan/cuttle/cuttle"
 )
 
 func main() {

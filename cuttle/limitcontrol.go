@@ -2,8 +2,9 @@ package cuttle
 
 import (
 	"container/list"
-	log "github.com/Sirupsen/logrus"
 	"time"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // LimitController defines behaviors of all rate limit controls.
