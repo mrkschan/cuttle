@@ -7,18 +7,22 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// LimitController defines behaviors of all rate limit controls.
+// LimitController defines behaviors of a rate limit control.
 type LimitController interface {
+	// Start the rate limit controller.
 	Start()
+	// Acquire permission to perform certain things.
+	// The permission is granted according to the rate limit rule.
 	Acquire()
 }
 
-// NoopControl does not do any rate limit.
+// NoopControl does not perform any rate limit.
 type NoopControl struct {
 	// Label of this control.
 	Label string
 }
 
+// NewNoopControl return a new NoopControl with the given label.
 func NewNoopControl(label string) *NoopControl {
 	return &NoopControl{label}
 }
@@ -28,7 +32,8 @@ func (c *NoopControl) Start() {
 	log.Debugf("NoopControl[%s]: Activated.", c.Label)
 }
 
-// Acquire permission to forward request from NoopControl.
+// Acquire permission from NoopControl.
+// Permission is granted immediately since it does not perform any rate limit.
 func (c *NoopControl) Acquire() {
 	log.Debugf("NoopControl[%s]: Seeking permission.", c.Label)
 	log.Debugf("NoopControl[%s]: Granted permission.", c.Label)
@@ -46,11 +51,13 @@ type RPSControl struct {
 	seen        *list.List
 }
 
+// NewRPSControl return a new RPSControl with the given label and rate.
 func NewRPSControl(label string, rate int) *RPSControl {
 	return &RPSControl{label, rate, make(chan uint), make(chan uint), list.New()}
 }
 
 // Start running RPSControl.
+// A goroutine is launched to govern the rate limit of Acquire().
 func (c *RPSControl) Start() {
 	go func() {
 		log.Debugf("RPSControl[%s]: Activated.", c.Label)
@@ -81,7 +88,8 @@ func (c *RPSControl) Start() {
 	}()
 }
 
-// Acquire permission to forward request from RPSControl.
+// Acquire permission from RPSControl.
+// Permission is granted at a rate of N requests per second.
 func (c *RPSControl) Acquire() {
 	log.Debugf("RPSControl[%s]: Seeking permission.", c.Label)
 	c.pendingChan <- 1

@@ -8,17 +8,32 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// A Zone holds the settings and states of the rate limited location(s).
 type Zone struct {
-	Host    string
-	Path    string
+	// Host specifies the URL host of the location(s).
+	// It supports using wildcard '*' for matching part of the host name.
+	// E.g. "*.github.com" matches both "www.github.com" and "api.github.com".
+	Host string
+	// Path specifies the URL path of the location(s).
+	// It supports using wildcard '*' for matching part of the path.
+	// E.g. "/*" matches both "/atom" and "/github".
+	Path string
+
+	// LimitBy specifies the rate limit subject of the location(s).
+	// Rate limit can be performed by "host" or "path".
 	LimitBy string
-	Shared  bool
+	// Shared specifies whether the rate limit is shared among all location(s) in the Zone.
+	Shared bool
+
+	// Control specifies which rate limit controller is used.
 	Control string
-	Rate    int
+	// Rate specifies the rate of the rate limit controller.
+	Rate int
 
 	controllers map[string]LimitController
 }
 
+// NewZone returns a new Zone given the configurations.
 func NewZone(host string, path string, limitby string, shared bool, control string, rate int) *Zone {
 	return &Zone{
 		host, path, limitby, shared, control, rate,
@@ -26,6 +41,7 @@ func NewZone(host string, path string, limitby string, shared bool, control stri
 	}
 }
 
+// MatchHost determines whether the host name of a location belongs to the Zone.
 func (z *Zone) MatchHost(host string) bool {
 	log.Debugf("Zone.MatchHost: zone - %s%s, host - %s", z.Host, z.Path, host)
 
@@ -41,6 +57,7 @@ func (z *Zone) MatchHost(host string) bool {
 	return matched
 }
 
+// MatchPath determines whether the URL path of a location belongs to the Zone.
 func (z *Zone) MatchPath(path string) bool {
 	log.Debugf("Zone.MatchHost: zone - %s%s, path - %s", z.Host, z.Path, path)
 
@@ -55,6 +72,7 @@ func (z *Zone) MatchPath(path string) bool {
 	return matched
 }
 
+// GetController returns the rate limit controller of a location.
 func (z *Zone) GetController(host string, path string) LimitController {
 	var key string
 	switch z.LimitBy {
