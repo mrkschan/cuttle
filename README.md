@@ -41,6 +41,7 @@ Why Cuttle is born?
 
 There are quite a number of ways to respect rate limit of an API service as below:
 
+* Have multiple processes to make API calls, each process would use the rate limit hints returned from the API to sleep.
 * Serialize all API calls into a single process, use sleep statement to make pause between consecutive calls. [4]
 * Host a RPC server / use a task queue to make API calls. The RPC server / queue manager has to rate limit the calls. [5]
 * Centralize all API calls with a HTTP proxy where the proxy performs rate limiting.
