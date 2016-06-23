@@ -13,7 +13,7 @@ type LimitController interface {
 	Start()
 	// Acquire permission to perform certain things.
 	// The permission is granted according to the rate limit rule.
-	Acquire()
+	Acquire() bool
 }
 
 // NoopControl does not perform any rate limit.
@@ -34,9 +34,36 @@ func (c *NoopControl) Start() {
 
 // Acquire permission from NoopControl.
 // Permission is granted immediately since it does not perform any rate limit.
-func (c *NoopControl) Acquire() {
+func (c *NoopControl) Acquire() bool {
 	log.Debugf("NoopControl[%s]: Seeking permission.", c.Label)
 	log.Debugf("NoopControl[%s]: Granted permission.", c.Label)
+
+	return true
+}
+
+// BanControl bans all the request.
+type BanControl struct {
+	// Label of this control.
+	Label string
+}
+
+// NewBanControl return a new BanControl with the given label.
+func NewBanControl(label string) *BanControl {
+	return &BanControl{label}
+}
+
+// Start running BanControl.
+func (c *BanControl) Start() {
+	log.Debugf("BanControl[%s]: Activated.", c.Label)
+}
+
+// Acquire permission from BanControl.
+// Permission is never granted.
+func (c *BanControl) Acquire() bool {
+	log.Debugf("BanControl[%s]: Seeking permission.", c.Label)
+	log.Debugf("BanControl[%s]: No permission granted.", c.Label)
+
+	return false
 }
 
 // RPSControl provides requests per second rate limit control.
@@ -90,9 +117,11 @@ func (c *RPSControl) Start() {
 
 // Acquire permission from RPSControl.
 // Permission is granted at a rate of N requests per second.
-func (c *RPSControl) Acquire() {
+func (c *RPSControl) Acquire() bool {
 	log.Debugf("RPSControl[%s]: Seeking permission.", c.Label)
 	c.pendingChan <- 1
 	<-c.readyChan
 	log.Debugf("RPSControl[%s]: Granted permission.", c.Label)
+
+	return true
 }
