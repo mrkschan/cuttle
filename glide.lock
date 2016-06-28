@@ -1,0 +1,20 @@
+hash: b4ad45e8e252525f9c7993a1053fe02f7f248963810ea96b1b382721672f980f
+updated: 2016-06-26T23:27:59.0960586+08:00
+imports:
+- name: github.com/elazarl/goproxy
+  version: 52c137b4b19acaf8cde1d9e0579d928519918919
+  subpackages:
+  - github.com\elazarl\goproxy
+- name: github.com/Sirupsen/logrus
+  version: f3cfb454f4c209e6668c95216c4744b8fddb2356
+  subpackages:
+  - github.com\Sirupsen\logrus
+- name: golang.org/x/sys
+  version: 62bee037599929a6e9146f29d10dd5208c43507d
+  subpackages:
+  - golang.org\x\sys\unix
+- name: gopkg.in/yaml.v2
+  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  subpackages:
+  - gopkg.in\yaml.v2
+devImports: []

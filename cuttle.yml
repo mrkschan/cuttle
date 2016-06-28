@@ -47,7 +47,7 @@ zones:
 #   control: rps  # Use request-per-second rate limit control.
 #   rate: 2  # At most 2 requests per second forwarded.
 # - host: "*"  # Apply to all other requests.
-#   control: noop  # Use no-op control, i.e., no rate limit.
+#   control: ban  # Use ban control, i.e., no request forwarded.
 #
 # NOTE: Wildcard '*' can only be applied to the field specified in 'limitby'.
 # NOTE: Default value of 'path' is '/'.

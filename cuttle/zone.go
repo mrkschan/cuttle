@@ -102,6 +102,8 @@ func (z *Zone) GetController(host string, path string) LimitController {
 			controller = NewRPSControl(key, z.Rate)
 		case "noop":
 			controller = NewNoopControl(key)
+		case "ban":
+			controller = NewBanControl(key)
 		}
 
 		z.controllers[key] = controller

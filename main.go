@@ -97,15 +97,21 @@ func main() {
 				}
 			}
 
+			acquired := false
 			if zone != nil {
 				// Acquire permission to forward request to upstream server.
-				zone.GetController(r.URL.Host, r.URL.Path).Acquire()
+				acquired = zone.GetController(r.URL.Host, r.URL.Path).Acquire()
 			} else {
 				// No rate limit applied.
 				log.Warnf("Main: No zone is applied to %s", r.URL)
 			}
 
-			// Forward request.
+			// Permission is not granted.
+			if !acquired {
+				return r, goproxy.NewResponse(r, goproxy.ContentTypeText, http.StatusForbidden, "Forbidden")
+			}
+
+			// Permission granted, forward request.
 			log.Infof("Main: Forwarding request to %s", r.URL)
 			return r, nil
 		})
