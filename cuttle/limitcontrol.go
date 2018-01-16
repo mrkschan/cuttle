@@ -162,7 +162,7 @@ func (c *RPMControl) Start() {
 
 				if waitTime := 60 - secondElapsed; waitTime > 0 {
 					log.Infof("RPMControl[%s]: Waiting for %ds.", c.Label, waitTime)
-					time.Sleep(time.Duration(waitTime) * time.Second * time.Millisecond)
+					time.Sleep(time.Duration(waitTime) * time.Second)
 				}
 
 				c.seen.Remove(front)
