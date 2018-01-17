@@ -11,7 +11,7 @@ import (
 	"github.com/elazarl/goproxy"
 	yaml "gopkg.in/yaml.v2"
 
-	"cuttle/cuttle"
+	"mrkschan/cuttle/cuttle"
 )
 
 func main() {
