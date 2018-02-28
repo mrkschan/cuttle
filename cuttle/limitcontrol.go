@@ -125,3 +125,64 @@ func (c *RPSControl) Acquire() bool {
 
 	return true
 }
+
+// RPMControl provides requests per minute rate limit control.
+type RPMControl struct {
+	// Label of this control.
+	Label string
+	// Rate holds the number of requests per minute.
+	Rate int
+
+	pendingChan chan uint
+	readyChan   chan uint
+	seen        *list.List
+}
+
+// NewRPMControl return a new RPMControl with the given label and rate.
+func NewRPMControl(label string, rate int) *RPMControl {
+	return &RPMControl{label, rate, make(chan uint), make(chan uint), list.New()}
+}
+
+// Start running RPMControl.
+// A goroutine is launched to govern the rate limit of Acquire().
+func (c *RPMControl) Start() {
+	go func() {
+		log.Debugf("RPMControl[%s]: Activated.", c.Label)
+
+		for {
+			<-c.pendingChan
+
+			log.Debugf("RPMControl[%s]: Limited at %dreq/m.", c.Label, c.Rate)
+			if c.seen.Len() == c.Rate {
+				front := c.seen.Front()
+				nanoElapsed := time.Now().UnixNano() - front.Value.(int64)
+				milliElapsed := nanoElapsed / int64(time.Millisecond)
+				secondElapsed := milliElapsed / 1000
+				log.Debugf("RPMControl[%s]: Elapsed %ds since first request.", c.Label, secondElapsed)
+
+				if waitTime := 60 - secondElapsed; waitTime > 0 {
+					log.Infof("RPMControl[%s]: Waiting for %ds.", c.Label, waitTime)
+					time.Sleep(time.Duration(waitTime) * time.Second)
+				}
+
+				c.seen.Remove(front)
+			}
+			c.seen.PushBack(time.Now().UnixNano())
+
+			c.readyChan <- 1
+		}
+
+		log.Debugf("RPMControl[%s]: Deactivated.", c.Label)
+	}()
+}
+
+// Acquire permission from RPMControl.
+// Permission is granted at a rate of N requests per minute.
+func (c *RPMControl) Acquire() bool {
+	log.Debugf("RPMControl[%s]: Seeking permission.", c.Label)
+	c.pendingChan <- 1
+	<-c.readyChan
+	log.Debugf("RPMControl[%s]: Granted permission.", c.Label)
+
+	return true
+}
