@@ -186,3 +186,66 @@ func (c *RPMControl) Acquire() bool {
 
 	return true
 }
+
+// RPNSControl provides Rate requests per N seconds rate limit control.
+type RPNSControl struct {
+	// Label of this control.
+	Label string
+	// Rate holds the number of requests per N seconds.
+	Rate int
+    // Nseconds holds the number N of seconds within which limiting occurs
+    Nseconds int
+
+	pendingChan chan uint
+	readyChan   chan uint
+	seen        *list.List
+}
+
+// NewRPNSControl return a new RPNSControl with the given label and rate.
+func NewRPNSControl(label string, rate int, nseconds int) *RPNSControl {
+	return &RPNSControl{label, rate, nseconds, make(chan uint), make(chan uint), list.New()}
+}
+
+// Start running RPNSControl.
+// A goroutine is launched to govern the rate limit of Acquire().
+func (c *RPNSControl) Start() {
+	go func() {
+		log.Debugf("RPNSControl[%s]: Activated.", c.Label)
+
+		for {
+			<-c.pendingChan
+
+			log.Debugf("RPNSControl[%s]: Limited at %dreq/%ds.", c.Label, c.Rate, c.Nseconds)
+			if c.seen.Len() == c.Rate {
+				front := c.seen.Front()
+				nanoElapsed := time.Now().UnixNano() - front.Value.(int64)
+				milliElapsed := nanoElapsed / int64(time.Millisecond)
+				secondElapsed := milliElapsed / 1000
+				log.Debugf("RPNSControl[%s]: Elapsed %ds since first request.", c.Label, secondElapsed)
+
+				if waitTime := int64(c.Nseconds) - secondElapsed; waitTime > 0 {
+					log.Infof("RPNSControl[%s]: Waiting for %ds.", c.Label, waitTime)
+					time.Sleep(time.Duration(waitTime) * time.Second)
+				}
+
+				c.seen.Remove(front)
+			}
+			c.seen.PushBack(time.Now().UnixNano())
+
+			c.readyChan <- 1
+		}
+
+		log.Debugf("RPNSControl[%s]: Deactivated.", c.Label)
+	}()
+}
+
+// Acquire permission from RPNSControl.
+// Permission is granted at a rate of Rate requests per N seconds.
+func (c *RPNSControl) Acquire() bool {
+	log.Debugf("RPNSControl[%s]: Seeking permission.", c.Label)
+	c.pendingChan <- 1
+	<-c.readyChan
+	log.Debugf("RPNSControl[%s]: Granted permission.", c.Label)
+
+	return true
+}
