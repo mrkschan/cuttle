@@ -29,14 +29,14 @@ type Zone struct {
 	Control string
 	// Rate specifies the rate of the rate limit controller.
 	Rate int
-
+    Nseconds int
 	controllers map[string]LimitController
 }
 
 // NewZone returns a new Zone given the configurations.
-func NewZone(host string, path string, limitby string, shared bool, control string, rate int) *Zone {
+func NewZone(host string, path string, limitby string, shared bool, control string, rate int, nseconds int) *Zone {
 	return &Zone{
-		host, path, limitby, shared, control, rate,
+		host, path, limitby, shared, control, rate, nseconds,
 		make(map[string]LimitController),
 	}
 }
@@ -102,6 +102,8 @@ func (z *Zone) GetController(host string, path string) LimitController {
 			controller = NewRPSControl(key, z.Rate)
 		case "rpm":
 			controller = NewRPMControl(key, z.Rate)
+        case "rpns":
+			controller = NewRPNSControl(key, z.Rate, z.Nseconds)
 		case "noop":
 			controller = NewNoopControl(key)
 		case "ban":

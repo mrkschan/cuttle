@@ -55,11 +55,15 @@ func main() {
 		if c.LimitBy == "" {
 			c.LimitBy = "host"
 		}
+        
+        if c.Nseconds == 0 {
+            c.Nseconds = 1
+        }
 
-		log.Debugf("ZoneConfig: host - %s, path - %s, limitby - %s, shared - %t, control - %s, rate - %d",
-			c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
+		log.Debugf("ZoneConfig: host - %s, path - %s, limitby - %s, shared - %t, control - %s, rate - %d, nseconds - %d",
+			c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate, c.Nseconds)
 
-		zones[i] = *cuttle.NewZone(c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate)
+		zones[i] = *cuttle.NewZone(c.Host, c.Path, c.LimitBy, c.Shared, c.Control, c.Rate, c.Nseconds)
 	}
 
 	// Config CA Cert.
@@ -130,10 +134,11 @@ type Config struct {
 }
 
 type ZoneConfig struct {
-	Host    string
-	Path    string // Optional, default "/"
-	LimitBy string // Optional, default "host"
-	Shared  bool   // Optional, default "false"
-	Control string
-	Rate    int
+	Host     string
+	Path     string // Optional, default "/"
+	LimitBy  string // Optional, default "host"
+	Shared   bool   // Optional, default "false"
+	Control  string
+	Rate     int
+    Nseconds int    // Optional, default "1"
 }

@@ -14,8 +14,9 @@ addr: :3128
 zones:
   - host: "*"  # Apply to requests forwarded to all domains.
     shared: true  # The rate limit is shared by all domains.
-    control: rps  # Use request-per-second rate limit control.
-    rate: 2  # At most 2 requests per second in the entire zone.
+    control: rpns  # Use request-per-second rate limit control.
+    rate: 1  # At most 1 requests per N second in the entire zone.
+    nseconds: 3 # N second = 3
 
 # Example - Only throttle *.github.com and no rate limit on other domains.
 #
