@@ -4,7 +4,7 @@ import (
 	"container/list"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // LimitController defines behaviors of a rate limit control.

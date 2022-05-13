@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // A Zone holds the settings and states of the rate limited location(s).
