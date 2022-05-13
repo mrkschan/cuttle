@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/elazarl/goproxy"
 	yaml "gopkg.in/yaml.v2"
 
